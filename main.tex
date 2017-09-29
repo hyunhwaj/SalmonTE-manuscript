@@ -95,15 +95,16 @@ The entire source code and executable scripts are available at \url{https://gith
 \subsection{Transposable Element Library Preparation}
 % revised
 \textcolor{red}{
-As we mentioned earlier, \SalmonTE~need a library of TE which consists of FASTA file of cDNA sequences to create index for the TE quantification. \SalmonTE~basically provides \texttt{Salmon} index files of TE libraries of \textit{Homo sapiens} and \textit{Drosophila melanogaster}. We introduce how we collected the files in this subsection. First, we collected FASTA files of the TE cDNA sequences for \textit{Homo sapiens} and \textit{Drosophila melanogaster} from Repbase (version 22.06)\cite{repbase}.
-We hypothesized that it is difficult to estimate several TEs which replicate without an RNA intermediate from RNA-seq sample, so we have excluded those kind of elements: simple repeats and multi-copy genes, and DNA transposable. After collecting the cDNA sequences, we manually curated clades of each TE based on the repeat class annotation of Repbase. \\
+As we mentioned earlier, \SalmonTE~needs a library of TE which consists of FASTA file of cDNA sequences to create an index for the TE quantification. \SalmonTE~ provides \texttt{Salmon} index files of TE libraries of \textit{Homo sapiens} and \textit{Drosophila melanogaster}. We introduce how we generate the index files in this subsection. First, we collected FASTA files of the TE cDNA sequences for \textit{Homo sapiens} and \textit{Drosophila melanogaster} from Repbase (version 22.06)\cite{repbase}.
+We hypothesized that it is hard to estimate several TEs which replicate without an RNA intermediate from RNA-seq sample, so we have excluded those kinds of elements: simple repeats and multi-copy genes, and DNA transposable. After collecting the cDNA sequences, we manually curated clades of each TE based on the repeat class annotation of Repbase. \\
 As a result, the generated TE library index files contains 687 TEs for \textit{Homo sapiens} and 163 TEs for \textit{Drosophila melanogaster}.}
 
 \subsection{Salmon quantification algorithm}
 
 \textcolor{blue}{Note: this part is totally changed. I hope you read this part carefully.}
 
-We adopted the \texttt{Salmon} [\refcite{patro2017salmon}] algorithm to estimate the relative TE abundance from given RNA-seq sample. \texttt{Salmon} enables a fast and accurate quantification of TE expression from RNA-seq reads with a light-weight mapping, online initial expression estimation phase, and offline inference for the estimation refinement.\cite{patro2017salmon,srivastava2016rapmap,bishop2006pattern,foulds2013stochastic}. A The goal of the algorithm is to quantify the relative abundance of each TE from given a known transcriptome $T$ and a set of sequenced fragments (reads) $F$.
+We adopted the \texttt{Salmon} [\refcite{patro2017salmon}] algorithm to estimate the relative TE abundance from given RNA-seq sample. \texttt{Salmon} enables a fast and accurate quantification of TE expression from RNA-seq reads with a light-weight mapping, online initial expression estimation phase, and offline inference for the estimation refinement.\cite{patro2017salmon,srivastava2016rapmap,bishop2006pattern,foulds2013stochastic} 
+A The goal of the algorithm is to quantify the relative abundance of each TE from given a known transcriptome $T$ and a set of sequenced fragments (reads) $F$.
 Suppose that we have $M$ TEs and the set of underlying true TE counts are given as $T = \{(t_1, \dots , t_M), (c_1, \dots, c_M) \}$, where $t_i$ is the nucleotide sequence of $i$-th transcript in the set and $c_i$ is true count of the corresponded TE. If $T$ contains a complete count then we can calculate the nucleotide fraction $\eta_i$ of each $t_i$ from (\ref{eq:1}),
 
 \begin{equation} \label{eq:1}
@@ -119,8 +120,8 @@ We also can calculate the transcript fraction of each transcript using (\ref{eq:
 \end{equation}
 where $\tau_i$ can be used as a measure of relative transcript abundance. Transcripts Per Million (TPM) can be calculated as $TPM=\tau_i \times 10^6$ and the $TPM$ is used as a relative abundance measure of each transposable element for a given sample in this study. 
 
-It is difficult to directly estimate $\eta$ from given $T$ and $F$, so \texttt{Salmon} performs those following processes.
-\texttt{Salmon} firstly runs a quasi-mapping which is initially proposed in [\refcite{srivastava2016rapmap}]. A quasi-mapping specifies the target of each given read and also determines the position and the orientation of the read concerning the target by computing the
+It is difficult to directly estimate the $\eta$ and $\tau$ from given $T$ and $F$, so \texttt{Salmon} performs those following processes.
+\texttt{Salmon} runs first a quasi-mapping which is initially proposed in [\refcite{srivastava2016rapmap}]. A quasi-mapping specifies the target of each given read and also determines the position and the orientation of the read concerning the target by computing the
 Maximum Mappable Prefix (MMP) [\refcite{li2012exploring}] and Next Informative Position (NIP) [\refcite{srivastava2016rapmap}] of the read.
 This mapping procedure depends on a generalized suffix array \cite{manber1993suffix},  and it enables a fast and accurate mapping as compared to other mapping tools, such as \texttt{Bowtie 2}, \texttt{STAR}, and \texttt{Kalisto} \cite{srivastava2016rapmap}. The mapping allows to determine possible mapping locations of each read.
 % Once the mapping is finished then mapping generate a have a binary matrix of TE-sequence read alignment where $z_{ij}=1$ if $j$-th read is derived from $i$-th TE.
@@ -156,23 +157,25 @@ where $\hat{\eta_i}=\frac{\alpha_i}{\sum_{j}\alpha_j}$. Once the offline phase h
 
 \subsection{Statistical tests}
 We provide a statistical analysis function to identify differentially expressed TEs from the counts table as the last step of the pipeline. 
-Differential analysis using DESeq2 can handle  binary covariates such as binary genotype: phenotype and gender \cite{love2014moderated}. To handle quantitative covariates such as age, we apply the General Linear Model (GLM)\cite{johnston1980multivariate}. The statistical analysis will produce two statistics to show associations between the TEs and the covariates:
-
-the first one is the test statistics for each TE, and the second one is the summary of the statistics for each clade. 
+Differential analysis using DESeq2 can handle  binary covariates such as binary genotype: phenotype and gender \cite{love2014moderated}. To handle quantitative covariates such as age, we apply the General Linear Model (GLM)\cite{johnston1980multivariate}. The statistical analysis will produce two statistics to show associations between the TEs and the covariates: the first one is the test statistics for each TE, and the second one is the summary of the statistics for each clade. 
 The output files are provided with various file formats, such as tab-separated values file (TSV), XML spreadsheet file format (XLS, XLSX), R object file (Rdata), and Portable Document Format (PDF) file.
 
 \section{Results}
 
 \subsection{Datasets}
 
-The RNA-seq data from Gene Expression Omnibus (accession no. GSE47006)
+\textcolor{blue}{Note: This part also changed.}
+
+We have used two different dataset for the experiment of this study. The first dataset is the RNA-seq data from Gene Expression Omnibus (accession no. GSE47006)
 which includes wild-type and \textit{Piwi} (P-element Induced WImpy testis) knockdown fly experiments
-which was used as a benchmark dataset in the \TEtranscripts~paper.\cite{ohtani2013dmgtsf1} We compared the performance in terms of running time and quantification accuracy between our proposed pipeline and \TEtranscripts.
+which was used as a benchmark dataset in the \TEtranscripts~paper.\cite{ohtani2013dmgtsf1} We compared the performance in terms of running time and quantification accuracy between our proposed pipeline and other tools, \TEtranscripts, \HTSeq, \Cuffdiff~and \RepEnrich.\cite{jin2015tetranscripts,anders2015htseq,trapnell2013differential,criscione2014repenrich}
 
 Moreover, as a pilot study for a novel finding, we seek to identify TEs that are  differentially express between Amyotrophic Lateral Sclerosis (ALS) patients and healthy  controls.
 We demonstrated our pipeline with a K562 cell-line RNA-seq dataset from ENCODE (Encyclopedia of DNA Elements, \url{http://encodeproject.org})  Consortium (accession ID: ENCBS555BYH).\cite{encode2012integrated}
 The dataset consists of two biological replicates of shRNA (short hairpin RNA) knockdown (KD) targeting \textit{TARDBP} (TAR DNA Binding Protein, as known as TDP-43) gene and two biological replicates of controls (a shRNA inserted but targets no genes). 
-It has been reported that loss of \textit{TDP-43} function causes  ALS.\cite{yang2014partial,mihevc2016tdp} To measure scalability with the dataset. we also ran \TEtranscripts~to compare running time of both methods.
+It has been reported that loss of \textit{TDP-43} function causes  ALS.\cite{yang2014partial,mihevc2016tdp} To measure scalability with the dataset. we also ran \TEtranscripts~to compare running time of both methods. We also performed an integrative analysis for highly differentially expressed TEs for further understanding of a hidden mechanism of the differential expressions.
+
+
 
 \subsection{Computational experiment setup}
 
