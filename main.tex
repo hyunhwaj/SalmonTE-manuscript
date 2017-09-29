@@ -3,11 +3,15 @@
 \usepackage{ws-procs-thm}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage[usenames, dvipsnames]{color}
 \usepackage[final]{pdfpages}
 
 \newcommand{\etal}{\textit{et al}.}
 \newcommand{\TEtranscripts}{\texttt{TEtranscripts}}
 \newcommand{\SalmonTE}{\texttt{SalmonTE}}
+\newcommand{\HTSeq}{\texttt{HTSeq-count}}
+\newcommand{\Cuffdiff}{\texttt{Cuffdiff}}
+\newcommand{\RepEnrich}{\texttt{RepEnrich}}
 \begin{document}
 
 
@@ -26,12 +30,8 @@ $^{\dag}$E-mail: zhandonl@bcm.edu}
 
 \begin{abstract}
 
-Transposable elements (TEs) are DNA sequences 
-which are capable of moving from one location to another
-and represent a large proportion (45\%) of the human genome. 
-TEs have functional roles
-in a variety of biological phenomena such as
-cancer,
+Transposable elements (TEs) are DNA sequences which are capable of moving from one location to another and represent a large proportion (45\%) of the human genome. 
+TEs have functional roles in a variety of biological phenomena such as cancer,
 neurodegenerative disease, and aging.
 Rapid development in RNA-sequencing technology has enabled us, for the first time, to study the activity of TE at the systems level.  
 
@@ -40,10 +40,9 @@ However, efficient TE analysis tools are not yet developed.
 In this work, we developed \SalmonTE, a fast and reliable pipeline for the quantification of TEs from 
 RNA-seq data.
 We benchmarked our tool against \TEtranscripts, a widely used TE quantification method, using several RNA-seq datasets from
-Drosophila melanogaster
-and human cell-line.
+Drosophila melanogaster and human cell-line.
 We achieved 20 times faster execution speed without compromising the accuracy.
-This pipeline will enable the biomedical research community to quantify and analyze TEs from large amounts of data, and could lead to novel TE centric hypotheses.
+This pipeline will enable the biomedical research community to quantify and analyze TEs from large amounts of data and lead to novel TE centric hypotheses.
 
 
 \end{abstract}
@@ -61,22 +60,31 @@ Most of the TEs in the genome are not functional and had been considered as `jun
 
 Furthermore, the mobilization of TEs can disrupt normal gene structure in the genome, sometimes leading to disease such as cancer \cite{belancio2008mammalian,jirtle2007environmental} neurodegenerative diseases,\cite{erwin2014mobile} and aging.\cite{wood2013chromatin} 
 
-Recent development of high-throughput Next Generation Sequencing (NGS), like RNA-seq, enables genome-wide study for TEs [\refcite{ohtani2013dmgtsf1,mihevc2016tdp,li2012transposable,krug2017retrotransposon}], and several algorithms and pipelines were proposed to analyze reads files from TE studies \cite{lee2012landscape,platzer2012te,helman2014somatic,henaff2015jitterbug,jin2015tetranscripts,de2017identifying,tang2017human}. However, most of the tools share some common limitations: 1) discordant read mapping, due to the chance of multiple mapping is much higher in repetitive elements shared by TEs in the same clade, 2) limited scalability for large-scale analysis, and 3) small coverage for the entire TEs defined in the human genome. 
-For example, a tool used in [\refcite{tang2017human}] only considered LINE 1 (Long Interspersed Nuclear Element 1) elements.\cite{ewing2015transposable} 
+Recent development of high-throughput Next Generation Sequencing (NGS), like RNA-seq, enables genome-wide study for TEs [\refcite{ohtani2013dmgtsf1,mihevc2016tdp,li2012transposable,krug2017retrotransposon}], and several algorithms and pipelines were proposed to analyze reads files from TE studies \cite{lee2012landscape,platzer2012te,helman2014somatic,henaff2015jitterbug,jin2015tetranscripts,de2017identifying,tang2017human}. However, most of the tools share some common limitations: 1) discordant read mapping, due to the chance of multiple mapping is much higher in repetitive elements shared by TEs in the same clade, 2) limited scalability for large-scale analysis, and 3) small coverage for the entire TEs defined in the human genome, i.e., a tool used in [\refcite{tang2017human}] only considered LINE 1 (Long Interspersed Nuclear Element 1) elements.\cite{ewing2015transposable} 
 
 Among the existing tools, \TEtranscripts~has performed well on various datasets.\cite{jin2015tetranscripts}
 Nonetheless, The scalability of \TEtranscripts~is a critical limiting factor for large systems biology studies because it cannot handle \verb|FASTQ| files directly and needs \verb|SAM| (Sequence Alignment Map)/\verb|BAM| (Binary Sequence Alignment Map) files generated from raw \verb|FASTQ| files to execute \TEtranscripts. Since there are many tuning parameters on handling repetitive sequence mapping among different RNA-seq mapping algorithms, this step will be highly variable depending on the mapping parameters and sometimes even generate artifactual results if a unique mapping parameter is superimposed by a previous analyst who handled the mapping. 
-Furthermore, the interval tree algorithm \cite{samet1990design}, which is used to find the interval of genes or TEs on reference genome,  performed poorly in terms of running time in practice. Thus, \TEtranscripts~may be suboptimal for to perform large-scale TE analysis.
+Furthermore, the interval tree algorithm \cite{samet1990design}, which is used to find the interval of genes or TEs on the reference genome,  performed poorly in terms of running time in practice. Thus, \TEtranscripts~may be suboptimal for to perform large-scale TE analysis, even the author of the paper claims \TEtranscripts~is the fastest tool for TE quantification.
 
-Although most of TE studies only contain a few RNA-seq samples, recent studies demonstrated that large-scale analysis of public meta RNA-seq datasets offered new insight and findings that cannot be discovered in each individual dataset. \cite{nellore2016human} However, a meta study on TE without using a large number of high performance computing cluster is not yet feasible given the time complexity of current algorithms.  To achieve this, we developed a new pipeline called \SalmonTE. It deploys a low time-complexity quantification method, \verb|Salmon|\cite{patro2017salmon}, and contains various statistical models for the quantifications. Moreover, users do not have to do any pre-processing for their raw \verb|FASTQ| files. 
-In the results section, we demonstrate that the running speed of  \SalmonTE~outperforms \TEtranscripts~and delivers a reliable quantification result as well.
+Although most of TE studies only contain a few RNA-seq samples, recent studies demonstrated that large-scale analysis of public meta RNA-seq datasets offered new insight and findings that cannot be discovered in each dataset. \cite{nellore2016human} However, a meta-study on TE without using a large number of high-performance computing cluster is not yet feasible given the time complexity of current algorithms.  To achieve this, we developed a new pipeline called \SalmonTE. It deploys a low time-complexity quantification method, \verb|Salmon|\cite{patro2017salmon}, and contains various statistical models for the quantification. Moreover, users do not have to do any pre-processing for their raw \verb|FASTQ| files. 
+In the results section, we demonstrate that the running speed of \SalmonTE~outperforms \TEtranscripts~and delivers a reliable quantification result as well.
 
 \section{Methods}
 
-The proposed pipeline consists of three parts: library preparation, quantification, and statistical analysis (Figure \ref{aba:fig1}). 
+The proposed pipeline consists of three parts: library preparation, quantification, and statistical analysis.
+%% Add paragraph for R1's comment of "presentation"  
+\textcolor{red}{
+Figure \ref{aba:fig1} illustrates the workflow of the proposed pipeline.
+To increase the usability and to enable parallel processing for multiple RNA-seq reads files, we adopted \texttt{Snakemake} workflow system and wrote a script on the execution rule of \texttt{Snakemake} for the TE quantification.\cite{koster2012snakemake}
+}
+\textcolor{red}{
+There are a couple of distinct features of \SalmonTE~, which contrasts to \TEtranscripts.
+As we mentioned earlier, the workflow of \SalmonTE~starts with raw RNA-seq files, and it does not need any additional pre-processing of given sequence data, but \TEtranscripts~ needs to align raw sequence reads onto the reference genome. Moreover, \TEtranscripts~unable to quantify without an annotation of each TE locations by the authors (only annotations of 8 species are currently supported), and users have to create a custom TE location annotation file by themselves if they want to run \TEtranscripts~ for a species which is not supported yet. In contrast to this, \SalmonTE~does not need that information and only needs a FASTA file of cDNA (complementary DNA) sequences of each TE, so users can less spend their time for the pre-processing. 
+}
 The entire source code and executable scripts are available at \url{https://github.com/hyunhwaj/SalmonTE}. 
 
-\begin{figure}[b]
+
+\begin{figure}[h]
 \centerline{
 \includegraphics[width=14cm]{fig1.pdf}
 }
@@ -85,42 +93,19 @@ The entire source code and executable scripts are available at \url{https://gith
 \end{figure}
 
 \subsection{Transposable Element Library Preparation}
-We collected the consensus cDNA sequence library of TEs for \textit{Homo sapiens} and \textit{Drosophila melanogaster} from Repbase   (version 22.06)\cite{repbase}. We did not include cDNA sequences of simple repeats and multicopy genes, and DNA transposables (which replicate without an RNA intermediate).  Next, we manually curated clades of each TE, based on the annotation of Repbase. As a result, our library contains 687 TEs for \textit{Homo sapiens} and 163 TEs for \textit{Drosophila melanogaster}.
+% revised
+\textcolor{red}{
+As we mentioned earlier, \SalmonTE~need a library of TE which consists of FASTA file of cDNA sequences to create index for the TE quantification. \SalmonTE~basically provides \texttt{Salmon} index files of TE libraries of \textit{Homo sapiens} and \textit{Drosophila melanogaster}. We introduce how we collected the files in this subsection. First, we collected FASTA files of the TE cDNA sequences for \textit{Homo sapiens} and \textit{Drosophila melanogaster} from Repbase (version 22.06)\cite{repbase}.
+We hypothesized that it is difficult to estimate several TEs which replicate without an RNA intermediate from RNA-seq sample, so we have excluded those kind of elements: simple repeats and multi-copy genes, and DNA transposable. After collecting the cDNA sequences, we manually curated clades of each TE based on the repeat class annotation of Repbase. \\
+As a result, the generated TE library index files contains 687 TEs for \textit{Homo sapiens} and 163 TEs for \textit{Drosophila melanogaster}.}
 
 \subsection{Salmon quantification algorithm}
-We adopted the \verb|Salmon| [\refcite{patro2017salmon}] algorithm to quantify the transposable elements abundance from given RNA-seq reads files. \verb|Salmon| enables a fast and accurate quantification of transcript expression from RNA-seq reads with quasi-mapping, a variant of stochastic, collapsed variational Bayesian inference (in the online phase), and Expectation Maximization (EM) algorithm (in the offline phase)\cite{patro2017salmon,srivastava2016rapmap,bishop2006pattern,foulds2013stochastic}. 
 
-Before running online and offline inference on the counts of each transposable element from a given reads file, \verb|Salmon| runs a quasi-mapping which is initially proposed in [\refcite{srivastava2016rapmap}]. A quasi-mapping specifies the target of each given read and also determines the position and the orientation of the read concerning the target by computing the
-Maximum Mappable Prefix (MMP) [\refcite{li2012exploring}] and Next Informative Position (NIP) [\refcite{srivastava2016rapmap}] of the read.
-This mapping procedure depends on a generalized suffix array \cite{manber1993suffix},  and it enables a fast and accurate mapping as compared to other mapping tools, such as \verb|Bowtie 2|, \verb|STAR|, and \verb|Kalisto| \cite{srivastava2016rapmap}. 
+\textcolor{blue}{Note: this part is totally changed. I hope you read this part carefully.}
 
-The online phase is to model the conditional probability $Pr \{f_j | t_i \}$, and uses the following auxiliary terms:
+We adopted the \texttt{Salmon} [\refcite{patro2017salmon}] algorithm to estimate the relative TE abundance from given RNA-seq sample. \texttt{Salmon} enables a fast and accurate quantification of TE expression from RNA-seq reads with a light-weight mapping, online initial expression estimation phase, and offline inference for the estimation refinement.\cite{patro2017salmon,srivastava2016rapmap,bishop2006pattern,foulds2013stochastic}. A The goal of the algorithm is to quantify the relative abundance of each TE from given a known transcriptome $T$ and a set of sequenced fragments (reads) $F$.
+Suppose that we have $M$ TEs and the set of underlying true TE counts are given as $T = \{(t_1, \dots , t_M), (c_1, \dots, c_M) \}$, where $t_i$ is the nucleotide sequence of $i$-th transcript in the set and $c_i$ is true count of the corresponded TE. If $T$ contains a complete count then we can calculate the nucleotide fraction $\eta_i$ of each $t_i$ from (\ref{eq:1}),
 
-\begin{equation}
-Pr \{f_j | t_i \} = Pr \{ l | t_i \} 
-\cdot Pr \{ p | t_i, l \} 
-\cdot Pr \{ o | t_i \} 
-\cdot Pr \{ a | f_j, t_i, p, o, l \} 
-\end{equation}
-
-where $Pr \{ l | t_i \}$  is the probability of drawing a read of the inferred length $l$ given $t_i$,  
-$Pr \{ p | t_i, l \}$ is the probability of the read starting at position $p$ on $t_i$,
-$Pr \{ o | t_i \}$ is the probability of obtaining a read
-alignment with the given orientation $o$ to $t_i$, and
-$Pr \{ a | f_j, t_i, p, o, l \} $ is the probability of the alignment $a$ \cite{patro2017salmon}. 
-This model accounts for sample-specific parameters and biases.
-The Laissez-faire stochastic variational Bayes SCVB0 inference algorithm is used to 
-compute the online abundance estimates auxiliary model parameters\cite{patro2017salmon}.
-
-After the quasi mapping, 
-we can estimate abundance (reads count) of each TE. 
-
-Suppose that
-we have $M$ TEs and the set of underlying true TE counts are given as
-$T = \{(t_1, \dots , t_M), (c_1, \dots, c_M) \}$, where $t_i$ is the nucleotide sequence of $i$-th transcript in the set and $c_i$ is true count of the corresponded transcript. 
-If $T$ contains a complete count then we can calculate the nucleotide fraction $\eta_i$ of each $t_i$ from (\ref{eq:1}).\cite{li2009rna}
-
- 
 \begin{equation} \label{eq:1}
 \eta_i = \frac{c_i \cdot \widetilde{l_i} }{\sum_{j=1}^{M} c_j \cdot \widetilde{l_j}}
 \end{equation}
@@ -132,22 +117,42 @@ We also can calculate the transcript fraction of each transcript using (\ref{eq:
 \tau_i = \frac{ \frac{\eta_i }{\widetilde{l_i}} }
 {\sum_{j=1}^{M} \frac{\eta_j }{\widetilde{l_j}} }
 \end{equation}
-where $\tau_i$ can be used as a measure of relative transcript abundance.
+where $\tau_i$ can be used as a measure of relative transcript abundance. Transcripts Per Million (TPM) can be calculated as $TPM=\tau_i \times 10^6$ and the $TPM$ is used as a relative abundance measure of each transposable element for a given sample in this study. 
 
+It is difficult to directly estimate $\eta$ from given $T$ and $F$, so \texttt{Salmon} performs those following processes.
+\texttt{Salmon} firstly runs a quasi-mapping which is initially proposed in [\refcite{srivastava2016rapmap}]. A quasi-mapping specifies the target of each given read and also determines the position and the orientation of the read concerning the target by computing the
+Maximum Mappable Prefix (MMP) [\refcite{li2012exploring}] and Next Informative Position (NIP) [\refcite{srivastava2016rapmap}] of the read.
+This mapping procedure depends on a generalized suffix array \cite{manber1993suffix},  and it enables a fast and accurate mapping as compared to other mapping tools, such as \texttt{Bowtie 2}, \texttt{STAR}, and \texttt{Kalisto} \cite{srivastava2016rapmap}. The mapping allows to determine possible mapping locations of each read.
+% Once the mapping is finished then mapping generate a have a binary matrix of TE-sequence read alignment where $z_{ij}=1$ if $j$-th read is derived from $i$-th TE.
 
-Transcripts Per Million (TPM) can be calculated as $TPM=\tau_i \times 10^6$ and the $TPM$ is used as a relative abundance measure of each transposable element for a given sample in this study. To estimate $T$, the maximum likelihood approach is used to assess given $T$ and $F$, which is a given set of mapped sequence reads from  the online inference step. We can define the probability of observing a set of sequenced fragments as below,
+\texttt{Salmon} also defines the maximum-likelihood objective model of observing a set of sequenced reads $F$ as follows:
 
 \begin{equation} \label{eq:3}
 Pr\{F|\eta,Z, T \}=
 \prod_{j=1}^{N}\sum_{i=1}^{M} Pr\{ t_i | \eta \}  \cdot
- Pr \{ f_i | t_i , z_{ij} = 1 \}
+ Pr \{ f_i | t_i, z_{ij}=1 \}
 \end{equation}
 
-where $z_{ij} = 1$ denotes if $j$-th read in $F$ is derived from transcript $i$. The likelihood objective can be optimized using the EM algorithm \cite{li2009rna}.
+where $z_{ij} = 1$ denotes if $j$-th read in $F$ is derived from $i$-th TE. Due to $Pr \{f_i| t_i, z_{ij}=1\}$ is unknown, \texttt{Salmon} uses the following auxiliary terms to define conditional model to estimate the probability:
 
-To increase the usability and to enable parallel processing for multiple RNA-seq reads files, we adopted \verb|Snakemake| workflow system and wrote a script on the execution rule for \verb|Snakemake|.\cite{koster2012snakemake}
+\begin{equation}
+Pr \{f_j | t_i \} = Pr \{ l | t_i \} 
+\cdot Pr \{ p | t_i, l \} 
+\cdot Pr \{ o | t_i \} 
+\end{equation}
 
+where $Pr \{ l | t_i \}$  is the probability of drawing a read of the inferred length $l$ given $t_i$,  
+$Pr \{ p | t_i, l \}$ is the probability of the read starting at position $p$ on $t_i$,
+$Pr \{ o | t_i \}$ is the probability of obtaining a read alignment with the given orientation $o$ to $t_i$, and this model accounts for sample-specific parameters and biases. 
 
+With those probabilistic models, \texttt{Salmon} performs online inference phase to estimate read counts $\alpha$ and nucleotide fraction $\eta$ using a variant of stochastic collapsed variational Bayesian inference (See Supplementary Algorithm in [\refcite{patro2017salmon}]).\cite{foulds2013stochastic} In addition to perform the inference algorithm, \texttt{Salmon} constructs equivalence classes for given $F$. We consider any pair of reads in a same equivalence class if both reads map to same set of target TE. This construction highly reduce the representation of the sequencing experiment and greatly reduce the running time of offline phase.\cite{patro2017salmon}
+
+After performing online inference phase, \texttt{Salmon} runs its offline phase. In this phase, given the set of equivalence classes of $F$, an EM algorithm were used to refine the previous estimation for each equivalence class with following objective function $L$:
+
+\begin{equation}
+L\{\alpha| F, Z, T\} = \prod_{j=1}^{N} \sum_{i=1}^{M} \hat{\eta_i} Pr \{f_j|t_i\}
+\end{equation},
+where $\hat{\eta_i}=\frac{\alpha_i}{\sum_{j}\alpha_j}$. Once the offline phase has done, \texttt{Salmon} finally outputs the estimation of each TE abundance for given sequence reads.
 
 \subsection{Statistical tests}
 We provide a statistical analysis function to identify differentially expressed TEs from the counts table as the last step of the pipeline. 
@@ -158,50 +163,84 @@ The output files are provided with various file formats, such as tab-separated v
 
 \section{Results}
 
-\subsection{Experiment setup}
-In the publication describing \TEtranscripts, they demonstrated that \TEtranscripts~is the best method among the published methods in terms of recovery accuracy of TE and running time for both cases of a synthetic dataset and published data.\cite{jin2015tetranscripts} 
+\subsection{Datasets}
 
 The RNA-seq data from Gene Expression Omnibus (accession no. GSE47006)
 which includes wild-type and \textit{Piwi} (P-element Induced WImpy testis) knockdown fly experiments
-which was used as a benchmark dataset in the \TEtranscripts~paper.\cite{ohtani2013dmgtsf1}
+which was used as a benchmark dataset in the \TEtranscripts~paper.\cite{ohtani2013dmgtsf1} We compared the performance in terms of running time and quantification accuracy between our proposed pipeline and \TEtranscripts.
 
-
-We compared  the performance in terms of running time and quantification accuracy between our proposed pipeline and \TEtranscripts.
-
-Moreover, as a pilot study, we seek to identify TEs that are  differentially express between Amyotrophic Lateral Sclerosis (ALS) patients and healthy  controls.
+Moreover, as a pilot study for a novel finding, we seek to identify TEs that are  differentially express between Amyotrophic Lateral Sclerosis (ALS) patients and healthy  controls.
 We demonstrated our pipeline with a K562 cell-line RNA-seq dataset from ENCODE (Encyclopedia of DNA Elements, \url{http://encodeproject.org})  Consortium (accession ID: ENCBS555BYH).\cite{encode2012integrated}
-The dataset consists of two biological replicates of shRNA (short hairpin RNA) knockdown (KD)
+The dataset consists of two biological replicates of shRNA (short hairpin RNA) knockdown (KD) targeting \textit{TARDBP} (TAR DNA Binding Protein, as known as TDP-43) gene and two biological replicates of controls (a shRNA inserted but targets no genes). 
+It has been reported that loss of \textit{TDP-43} function causes  ALS.\cite{yang2014partial,mihevc2016tdp} To measure scalability with the dataset. we also ran \TEtranscripts~to compare running time of both methods.
 
-targeting \textit{TARDBP} (TAR DNA Binding Protein, as known as TDP-43) gene and two biological replicates of controls 
-(a shRNA inserted but targets no genes). 
-It has been reported that loss of \textit{TDP-43} function causes 
-ALS.\cite{yang2014partial,mihevc2016tdp} To measure scalability with the dataset
-we also ran \TEtranscripts~to compare running time of both methods.
+\subsection{Computational experiment setup}
+
+Generating BAM files from \verb|FASTQ| files are mandatory to use \TEtranscripts, \HTSeq, \Cuffdiff, and \RepEnrich~, we applied \verb|STAR| [\refcite{dobin2013star}] to generate the files with following parameters: \verb|--outFilterMultimapNmax 100| and \verb|--–winAnchorMultimapNmax 100|. 16 threads were used for the both \SalmonTE~and \verb|STAR| . We also used the same parameter setup of each quantification tool as in the \TEtranscripts~paper.
+
+All of the computational experiments were done in a workstation with \texttt{Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz} (has 10 cores and maximum 40 threads) and \texttt{128GBytes} RAM. 
+
+\subsection{\SalmonTE guarantees a reliable TE expression estimation}
+
+\textcolor{red}{
+For the quantification accuracy comparison, we first took estimated abundance of 8 TEs from each quantification tool. Those 8 TEs have measured by Reverse Transcription-quantitative Polymerase Chain Reaction (RT-qPCR) for the relative expression validation in [\refcite{ohtani2013dmgtsf1}].
+We observed \SalmonTE~performs better than other tools ($r^2=0.9796$, Figure \ref{aba:fig4} and Table \ref{aba:table_corr}), but 
+it is slightly better than \TEtranscripts. However, we can found that \SalmonTE~outperforms that case of TEs which are weakly down-regulated (DM1731\_I and HETA) and \TEtranscripts~does not provide a correct estimation in this case.}
+
+\begin{figure}[h]
+\centerline{
+\includegraphics[width=14cm]{fig_bar}
+}
+\caption{\textcolor{red}{Comparison of Drosophila TE expression estimation.}}
+\label{aba:fig4}
+\end{figure}
+
+\begin{table}[h]
+\tbl{\textcolor{red}{Pearson Correlation between RT-qPCR and computational TE quantification methods.}}
+{\begin{tabular}{l|lllll}
+	\hline
+	Method    & \SalmonTE & \TEtranscripts & HTSeq-count & Cuffdiff & RepEnrich  \\ \hline
+	 $r^2$ & 0.9796 & 0.9658 & 0.8514 & NA & NA \\ \hline
+\end{tabular}}\label{aba:table_corr}
+\end{table}
+
+\begin{figure}[h]
+\centerline{
+\includegraphics[width=11cm]{figure_corr_FC}
+}
+\caption{Correlation of $log_{2}FC$ ($\frac{Piwi}{WT}$) for each transposable element between \SalmonTE~and \TEtranscripts. Red points represent points with same fold change direction between \SalmonTE~and \TEtranscripts.}
+\label{aba:fig2}
+\end{figure}
+
+After estimation comparison, we compared the estimated $log_{2}FC$ of \SalmonTE~ and \TEtranscripts on each transposable element for a deeper investigation. Figure \ref{aba:fig2} shows that the estimated TE abundance of both methods are highly correlated ($r^{2}=0.98$), and we also observed there is a high concordance in the direction of fold-changes between \SalmonTE~and \TEtranscripts. We also measured the correlations of normalized read counts between \SalmonTE~and \TEtranscripts, 
+and we can see that the calculated read counts from those methods are highly correlated in each sample. ($r^2=0.92$ for wild-type (WT) sample and $r^2=0.91$ for Piwi KD sample).
+From this observation, we conclude that both tools generate a similar estimation results. 
+\textcolor{red}{
+It is not a surprising results because \TEtranscripts~deploys \texttt{RSEM} algorithm,\cite{li2011rsem} and previous studies have demonstrated that transcripts count estimations from \texttt{RSEM} and \texttt{Salmon} are very correlated.\cite{jin2017comprehensive,zhang2017evaluation}
+From the observations, we can conclude \SalmonTE~provides a reliable estimation of TE expressions.}
+
+\begin{figure}[h]
+\centerline{
+\includegraphics[width=13cm]{figure_corr_count}
+}
+\caption{Sample correlation of count for each transposable element between \SalmonTE~and \TEtranscripts. \textbf{A}. WT sample, \textbf{B}. Piwi KD sample.}
+\label{aba:fig3}
+\end{figure}
 
 
-Generating BAM files from \verb|FASTQ| files are mandatory to use \TEtranscripts, so we applied \verb|STAR| [\refcite{dobin2013star}] to generate the files with following parameters:
 
-\verb|--outFilterMultimapNmax 100| and \verb|--–winAnchorMultimapNmax 100|. We also used 16 threads for the both \SalmonTE~and \verb|STAR| (for \TEtranscripts).
-All of the computational experiments were done in a workstation with 
-\verb|Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz| (has 10 cores and maximum 40 threads) and \verb|128GBytes| RAM.
-
-
-\subsection{Performance Benchmark on \SalmonTE}
-
-Compared to \TEtranscripts~,  \SalmonTE~ showed a 19x to 27x fold increase in speed (Table \ref{aba:table1}).
-In this analysis, we observe that \SalmonTE~outperforms \TEtranscripts~regarding processing speed. This pipeline just took less than 5 minutes for a sample, while \TEtranscripts~needs about 2 hours to process a single sample. 
-
-
-
+\subsection{\SalmonTE~shows a better scalability in the speed benchmarks}
+We measured speed of \SalmonTE~and\TEtranscripts~for two different datasets Table \ref{aba:table1} summarizes information for each dataset and results of the benchmarks.
+Compared to \TEtranscripts~,  \SalmonTE~ showed a 19x to 27x fold increase in speed.
+In this analysis, we strongly claim that \SalmonTE~outperforms \TEtranscripts~regarding processing speed. This pipeline just took less than 5 minutes for a sample, while \TEtranscripts~needs about 2 hours to process a single sample. 
 
 It also demonstrates \SalmonTE~can easily handle thousands of samples if the pipeline is extended using a cloud service. 
-Table \ref{aba:table_amazon} shows 
-our estimated cost if the proposed pipeline was implemented in a cloud computing environment, and it predicts the price is 22 times less than using \TEtranscripts.  
+Table \ref{aba:table_amazon} shows our estimated cost if the proposed pipeline was implemented in a cloud computing environment, and it predicts the price is 22 times less than using \TEtranscripts.  
 
 
 
 \begin{table}[h]
-\tbl{Performance comparison between \SalmonTE~and \TEtranscripts.}
+\tbl{Running speed comparison between \SalmonTE~and \TEtranscripts.}
 {
 \begin{tabular*}{.8\textwidth}{@{\extracolsep{\fill}}llll}
 \hline
@@ -228,50 +267,12 @@ Total price & \$680 & \$ 15,111 \\ \hline
 \end{tabular}}\label{aba:table_amazon}
 \end{table}
 
-\subsection{Quantification Accuracy}
-
-\begin{figure}[h]
-\centerline{
-\includegraphics[width=11cm]{figure_corr_FC}
-}
-\caption{Correlation of $log_{2}FC$ ($\frac{Piwi}{WT}$) for each transposable element between \SalmonTE~and \TEtranscripts. Red points represent points with same fold change direction between \SalmonTE~and \TEtranscripts.}
-\label{aba:fig2}
-\end{figure}
-
-We compared the estimated $log_{2}FC$ of \SalmonTE~and \TEtranscripts~on each transposable element from 
-RNA-seq fly data in [\refcite{ohtani2013dmgtsf1}].
-Figure \ref{aba:fig2} shows that the estimated TE abundance of both methods are highly correlated ($r^{2}=0.98$), and we also observed there is a high concordance in the direction of fold-changes between \SalmonTE~and \TEtranscripts. We also measured the correlations of normalized read counts between \SalmonTE~and \TEtranscripts, 
-and we can see that the calculated read counts from those methods are highly correlated in each sample. ($r^2=0.92$ for wild-type (WT) sample and $r^2=0.91$ for Piwi KD sample).
-From this observation, we conclude that \SalmonTE~ is similar as  \TEtranscripts~for TE quantification.
-
-\begin{figure}[h]
-\centerline{
-\includegraphics[width=13cm]{figure_corr_count}
-}
-\caption{Sample correlation of count for each transposable element between \SalmonTE~and \TEtranscripts. \textbf{A}. WT sample, \textbf{B}. Piwi KD sample.}
-\label{aba:fig3}
-\end{figure}
-
-Next, we took 8 TEs which were quantified by
-Reverse Transcription-quantitative Polymerase Chain Reaction (RT-qPCR) in [\refcite{ohtani2013dmgtsf1}]
-and validated by measuring the correlation of $log_{2}FC$ on each selected TE between RT-qPCR and \SalmonTE.
-We observed a high correlation between \SalmonTE~and RT-qPCR on those elements ($r^2=0.97$, Figure \ref{aba:fig4}). 
-
-\begin{figure}[h]
-\centerline{
-\includegraphics[width=10cm]{supp_fig3_corr}
-}
-\caption{Comparison between \SalmonTE~and RT-qPCR}
-\label{aba:fig4}
-\end{figure}
-
 \subsection{Demonstration on K562 cell-line TDP-43 data}
 
 Finally, we applied \SalmonTE~pipeline to the \textit{TDP-43} knockdown dataset.
 We identified 23 transposable elements that are differential expressed between TARDBP knockdown and control cell lines (Table \ref{aba:table2}) with the threshold of $|log_{2}FC| \geq 0.5$. No statistical test were performed because the number of replicates in the dataset are small. 
 
 We can see that most of the differentially expressed features are Endogenous Retrovirus (15 of 23) in \textit{TDP-43} cell-line sample, and we hypothesize that some of the differentially Endogenous Retrovirus TEs are associated with ALS.
-
 
 \textit{TDP-43} is an established and well-studied DNA and RNA binding protein,
 and could potentially regulate transposable elements at multiple levels.\cite{tan2016extensive} 
@@ -337,7 +338,7 @@ This result provides a working hypothesis that knocking-down of \textit{TDP-43} 
 \centerline{
 \includegraphics[width=10cm]{boxplot-clade-k562}
 }
-\caption{An boxplot of $log_{2}FC$ for each clade in the ENCODE \textit{TDP-43} data}
+\caption{A boxplot of $log_{2}FC$ for each clade in the ENCODE \textit{TDP-43} data}
 \label{aba:fig5}
 \end{figure}
 
@@ -353,9 +354,7 @@ Therefore, we expect this pipeline will enable the biomedical research community
 
 There are still several remaining features that requiring implementation in the future to improve the usability of \SalmonTE. 
 For example, prediction of genomic locations, which contain the differentially expressed TEs, is highly needed in many TE studies. Several methods were developed toward this end\cite{de2017identifying,criscione2014transcriptional}, but these tools share the scalability issue and require massive computing power for a large-scale TE study. 
-Moreover, alignment free algorithms are intrinsically limited to addressing this 
-
-question. 
+Moreover, alignment free algorithms are intrinsically limited to addressing this question. 
 Therefore, we foresee a novel algorithm which extends and improves a current alignment-free methods needs to be developed to address this.
 
 \section*{Acknowledgments}
