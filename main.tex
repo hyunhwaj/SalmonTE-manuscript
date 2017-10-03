@@ -77,7 +77,7 @@ The proposed pipeline consists of three parts: library preparation, quantificati
 \centerline{
 \includegraphics[width=14cm]{fig1.pdf}
 }
-\caption{An illustration of the \SalmonTE~pipeline. Left Panel: Input from Repbase to build the mapping index, raw \texttt{FASTQ} file, and covariates for statistical testing.  Middle Panel: The workflow of \SalmonTE~consists of three parts: building the index based on RepBase or user-input cDNA sequences of TEs, quantification based on \texttt{FASTQ} file, and statical test through the generalized linear model or differential expression analysis. Right Panel: Example output including the statistical report and box plot on estimated $log_2$ fold-change.}
+\caption{An illustration of the \SalmonTE~pipeline. Left Panel: Input from Repbase to build the mapping index, raw \texttt{FASTQ} file, and covariates for statistical testing.  Middle Panel: The workflow of \SalmonTE~consists of three parts: building the index based on Repbase or user-input cDNA sequences of TEs, quantification based on \texttt{FASTQ} file, and statical test through the generalized linear model or differential expression analysis. Right Panel: Example output including the statistical report and box plot on estimated $log_2$ fold-change.}
 \label{aba:fig1}
 \end{figure}
 
@@ -168,7 +168,7 @@ All of the computational experiments were done in a workstation with \texttt{Int
 \subsection{\SalmonTE~guarantees a reliable TE expression estimation}
 
 For the quantification accuracy comparison, we first took estimated abundance of 8 TEs from each quantification tool. To validate the results, Reverse Transcription-quantitative Polymerase Chain Reaction (RT-qPCR) was done on these 8 TEs [\refcite{ohtani2013dmgtsf1}].
-We observed \SalmonTE~outperformed all other tools ($r^2=0.9796$, Figure \ref{aba:fig4} and Table \ref{aba:table_corr}). We also found that \SalmonTE~identified a weak down-regulation of DM1731\_I and HETA which was missed by \TEtranscripts.
+We observed \SalmonTE~outperformed all other tools ($r^2=0.98$, Figure \ref{aba:fig4} and Table \ref{aba:table_corr}). We also found that \SalmonTE~identified a weak down-regulation of DM1731\_I and HETA which was missed by \TEtranscripts.
 
 \begin{figure}[h]
 \centerline{
@@ -185,7 +185,7 @@ Drosophila samples.}
 {\begin{tabular}{l|lllll}
 	\hline
 	Method    & \SalmonTE & \TEtranscripts & HTSeq-count & Cuffdiff & RepEnrich  \\ \hline
-	 $r^2$ & 0.9796 & 0.9658 & 0.8514 & NA & NA \\ \hline
+	 $r^2$ & 0.98 & 0.97 & 0.85 & NA & NA \\ \hline
 \end{tabular}}\label{aba:table_corr}
 \end{table}
 
