@@ -47,7 +47,7 @@ This pipeline will enable the biomedical research community to quantify and anal
 
 \end{abstract}
 
-\keywords{Transposable Element; Quasi Mapping; RNA-seq; Next Generation Sequencing; Large Scale Genome Analysis}
+\keywords{Transposable Element; Quasi-Mapping; RNA-seq; Next Generation Sequencing; Large Scale Genome Analysis}
 
 \copyrightinfo{\copyright\ 2017 The Authors. Open Access chapter published by World Scientific Publishing Company and distributed under the terms of the Creative Commons Attribution Non-Commercial (CC BY-NC) 4.0 License.}
 
@@ -90,8 +90,8 @@ As a result, the generated TE library index database contains 687 TEs for \texti
 \subsection{Salmon quantification algorithm}
 
 We adopted the \texttt{Salmon} [\refcite{patro2017salmon}] algorithm to estimate the relative TE abundance from a given RNA-seq sample. \texttt{Salmon} enables a fast and accurate quantification of TE expression from RNA-seq reads with a light-weight mapping, online initial expression estimation phase, and offline inference for the estimation refinement.\cite{patro2017salmon,srivastava2016rapmap,bishop2006pattern,foulds2013stochastic} 
-Salmon quantifies the relative abundance of each TE  given a transcriptome $T$ and a set of sequenced fragments (reads) $F$.
-Suppose that we have $M$ TEs and the set of underlying true TE counts are given as $T = \{(t_1, \dots , t_M), (c_1, \dots, c_M) \}$, where $t_i$ is the nucleotide sequence of $i$-th transcript in the set and $c_i$ is the true count of the corresponding TE. If $T$ contains a complete count, we can calculate the nucleotide fraction $\eta_i$ of each $t_i$ from (\ref{eq:1}),
+Salmon quantifies the relative abundance of each TE given a set of TE sequences $T$ and a set of sequenced fragments (reads) $F$.
+Suppose that we have $M$ TEs and the set of underlying true TE counts are given as $T = \{(t_1, \dots , t_M), (c_1, \dots, c_M) \}$, where $t_i$ is the nucleotide sequence of $i$-th TE in the set and $c_i$ is the true count of the corresponding TE. If $T$ contains a complete count, we can calculate the nucleotide fraction $\eta_i$ of each $t_i$ from (\ref{eq:1}),
 
 \begin{equation} \label{eq:1}
 \eta_i = \frac{c_i \cdot \widetilde{l_i} }{\sum_{j=1}^{M} c_j \cdot \widetilde{l_j}}
@@ -168,7 +168,7 @@ All of the computational experiments were done in a workstation with \texttt{Int
 \subsection{\SalmonTE~guarantees a reliable TE expression estimation}
 
 For the quantification accuracy comparison, we first took estimated abundance of 8 TEs from each quantification tool. To validate the results, Reverse Transcription-quantitative Polymerase Chain Reaction (RT-qPCR) was done on these 8 TEs [\refcite{ohtani2013dmgtsf1}].
-We observed \SalmonTE~outperfomed all other tools ($r^2=0.9796$, Figure \ref{aba:fig4} and Table \ref{aba:table_corr}). We also found that \SalmonTE~identified a weak down-regulation of DM1731\_I and HETA which was missed by \TEtranscripts.
+We observed \SalmonTE~outperformed all other tools ($r^2=0.9796$, Figure \ref{aba:fig4} and Table \ref{aba:table_corr}). We also found that \SalmonTE~identified a weak down-regulation of DM1731\_I and HETA which was missed by \TEtranscripts.
 
 \begin{figure}[h]
 \centerline{
@@ -216,9 +216,7 @@ It is not a surprising result because \TEtranscripts~deploys \texttt{RSEM} algor
 We measured the speed of \SalmonTE~and\TEtranscripts~on two different datasets (Table \ref{aba:table1}).  
 Compared to \TEtranscripts,  \SalmonTE~ showed a 19x to 27x fold increase in speed.
 In this analysis, we demonstrate that \SalmonTE~outperformed \TEtranscripts~in processing speed. Our pipeline finishes in less than 5 minutes, while \TEtranscripts~needs about 2 hours to process a single sample. 
-
-It also demonstrates \SalmonTE~can easily handle thousands of samples if the pipeline is extended using a cloud service. 
-\textbf{Table \ref{aba:table_amazon} shows our estimated cost if the proposed pipeline was implemented in a cloud computing environment, and it predicts the price is 22 times less than using \TEtranscripts. } 
+Moreover, our benchmark shows that estimated cost of our pipeline in the cloud computing environment  is for the thousands of samples 22 times cheaper than \TEtranscripts~in the computing environment (Table \ref{aba:table_amazon}).
 
 
 
@@ -255,7 +253,6 @@ Next, we applied \SalmonTE~pipeline to the \textit{TDP-43} knockdown dataset.
 We identified 23 transposable elements that are differential expressed between TARDBP knockdown and control cell lines (Table \ref{aba:table2}) with the threshold of $|log_{2}FC| \geq 0.5$. No statistical test were performed because the number of replicates in the dataset are small. 
 
 We can see that most of the differentially expressed features are Endogenous Retrovirus (15 of 23) in \textit{TDP-43} cell-line sample, and we hypothesize that some of the differentially Endogenous Retrovirus TEs are associated with ALS.
-
 \textit{TDP-43} is an established and well-studied DNA and RNA binding protein,
 and could potentially regulate transposable elements at multiple levels.\cite{tan2016extensive} 
 To facilitate a mechanistic understanding of the underlying regulatory mechanism of \textit{TDP-43} and to substantiate the identified differentially expressed transposable, we performed an integrative analysis by combining RNA-seq and \textit{TDP-43} binding data. 
@@ -318,7 +315,7 @@ This result provides a working hypothesis that knocking-down of \textit{TDP-43} 
 
 \begin{figure}[h]
 \centerline{
-\includegraphics[width=10cm]{boxplot-clade-k562}
+\includegraphics[width=8cm]{boxplot-clade-k562}
 }
 \caption{A boxplot of $log_{2}FC$ for each clade in the ENCODE \textit{TDP-43} data}
 \label{aba:fig5}
